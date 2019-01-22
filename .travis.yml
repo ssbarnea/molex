@@ -1,0 +1,54 @@
+dist: xenial
+cache:
+  bundler: true
+  pip: true
+  directories:
+  - $HOME/.cache/pre-commit
+  - $HOME/.pre-commit
+  - $HOME/.rvm
+  - $HOME/virtualenv/python$(python -c 'import platform; print(platform.python_version())')
+  - $HOME/Library/Caches/Homebrew
+
+services:
+- docker
+
+stages:
+  - test
+before_install:
+  - which apt-key && sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B05F25D762E3157 || true
+  # ^ https://github.com/git-lfs/git-lfs/issues/3474
+  - which tox >/dev/null || if [ -z ${VIRTUAL_ENV+x} ]; then python -m pip install --user tox tox-pyenv wheel ; else python -m pip install tox tox-pyenv wheel twine; fi
+jobs:
+  include:
+    - name: from-macos
+      osx_image: xcode8.3
+      # ^ workaround for https://github.com/travis-ci/travis-ci/issues/9929
+      os: osx
+    - name: centos-7
+      stage: test
+      script: python -m tox
+      env: TOXENV=molecule
+    - name: fedora-28
+      stage: test
+      script: python -m tox
+      env: TOXENV=molecule-fedora-28
+    - name: fedora-latest
+      stage: test
+      script: python -m tox
+      env: TOXENV=molecule-fedora-latest
+    - name: fedora-rawhide
+      stage: test
+      script: python -m tox
+      env: TOXENV=molecule-fedora-rawhide
+env:
+  global:
+    - PIP_DISABLE_PIP_VERSION_CHECK=1
+addons:
+  apt:
+    packages:
+    - lxc
+    - lxc-dev
+    - lxd
+    - lxd-client
+script:
+- tox

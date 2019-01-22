@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+
+    - name: one noop
+      debug: var=ansible_distribution
