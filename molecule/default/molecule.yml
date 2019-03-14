@@ -22,6 +22,7 @@ platforms:
   - name: ${_MOLECULE_PLATFORM:-centos}
     hostname: "${_MOLECULE_PLATFORM-centos}"
     image: ${_MOLECULE_DOCKER_IMAGE:-centos:7}
+    dockerfile: Dockerfile-custom.j2
     environment:
       http_proxy: "{{ lookup('env', 'http_proxy') }}"
       https_proxy: "{{ lookup('env', 'https_proxy') }}"
