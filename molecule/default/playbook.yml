@@ -3,5 +3,7 @@
   hosts: all
   tasks:
 
-    - name: one noop
-      debug: var=ansible_distribution
+    - name: install some packages
+      package:
+        name:
+          - mc

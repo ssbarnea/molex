@@ -1,46 +1,44 @@
 ---
-dependency:
-  name: galaxy
 driver:
   name: docker
 log: true
 platforms:
-  # Until https://github.com/ansible/molecule/issues/1665 is implemented we
-  # do use only one parametrized platform in config file which allows us to
-  # control what we test from outside (zuul)
-  # - name: centos
-  #   hostname: centos
-  #   image: centos/systemd:latest
-  #   # ^ this is based on centos 7 at the moment and we have no other tag to use
-  #   environment:
-  #     http_proxy: "{{ lookup('env', 'http_proxy') }}"
-  #     https_proxy: "{{ lookup('env', 'https_proxy') }}"
-  # - name: fedora-rawhide
-  #   hostname: fedora-rawhide
-  #   image: fedora:rawhide
-  # ^ disabled until a fix is released: https://github.com/ansible/molecule/issues/1645
-  - name: ${_MOLECULE_PLATFORM:-centos}
-    hostname: "${_MOLECULE_PLATFORM-centos}"
-    image: ${_MOLECULE_DOCKER_IMAGE:-centos:7}
-    dockerfile: Dockerfile-custom.j2
-    environment:
+
+  - name: centos7
+    hostname: centos7
+    image: centos:7
+    dockerfile: Dockerfile.j2
+    pkg_extras: python-setuptools
+    easy_install:
+      - pip
+    environment: &env
       http_proxy: "{{ lookup('env', 'http_proxy') }}"
       https_proxy: "{{ lookup('env', 'https_proxy') }}"
+  #   volumes:
+  #     - /var/cache/yum:/var/cache/yum:rw
+
+  # - name: fedora28
+  #   hostname: fedora28
+  #   image: fedora:28
+  #   dockerfile: Dockerfile.j2
+  #   pkg_extras: python*-setuptools
+  #   environment:
+  #     <<: *env
+  #   volumes:
+  #     - /var/cache/yum:/var/cache/yum:rw
+
 provisioner:
   name: ansible
+  log: true
   env:
     ANSIBLE_STDOUT_CALLBACK: yaml
 scenario:
-  name: default
   test_sequence:
     - destroy
-    # - dependency
     - create
-    # - prepare
+    - prepare
     - converge
-    - idempotence
-    - side_effect
     - verify
-    - destroy
-verifier:
-  name: testinfra
+    # - destroy
+lint:
+  enabled: false

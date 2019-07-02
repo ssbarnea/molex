@@ -1,4 +1,7 @@
-molecule>=2.19.0  # MIT
-docker>=3.6.0  # Apache-2.0
-backports.ssl-match-hostname>=3.7.0; python_version=='2.7'  # PSF
-# ^ workaround for
+# testing bleading edge of all these:
+pytest-html
+pytest-molecule
+pytest-cov
+pytest-xdist
+selinux
+molecule
